@@ -1,0 +1,123 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #0f1923;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+header {
+  background: #1a2733;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #95C11F;
+}
+
+header h1 {
+  color: #95C11F;
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+.machine-name {
+  color: #aaaaaa;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+main {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.card {
+  background: #1a2733;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #243547;
+}
+
+.card h2 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #aaaaaa;
+  margin-bottom: 16px;
+}
+
+/* Status card */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.status-dot.on { background: #95C11F; box-shadow: 0 0 12px #95C11F; }
+.status-dot.off { background: #e74c3c; box-shadow: 0 0 12px #e74c3c; }
+.status-dot.unknown { background: #aaaaaa; }
+
+.status-label {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.status-since {
+  font-size: 13px;
+  color: #aaaaaa;
+  margin-top: 8px;
+}
+
+/* Timeline */
+.timeline-bar {
+  height: 40px;
+  background: #0f1923;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+}
+
+.timeline-segment.on { background: #95C11F; }
+.timeline-segment.off { background: #e74c3c; }
+
+/* Events table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th {
+  text-align: left;
+  padding: 8px 12px;
+  color: #aaaaaa;
+  border-bottom: 1px solid #243547;
+}
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #1e2d3a;
+}
+
+.badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.on { background: #1e3a1e; color: #95C11F; }
+.badge.off { background: #3a1e1e; color: #e74c3c; }
