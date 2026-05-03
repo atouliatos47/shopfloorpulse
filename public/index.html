@@ -3,13 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ClamClamp | Pero Degreaser</title>
+  <title>ShopFloorPulse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    #app-name { font-family: 'Russo One', sans-serif; font-size: 22px; letter-spacing: 2px; color: #4a4a4a; }
+    #app-name .highlight { color: #1a6fd4; }
+  </style>
 </head>
 <body>
+
   <header>
-    <h1>ClamClamp</h1>
-    <span class="machine-name">Pero Degreaser</span>
+    <img id="company-logo" src="" alt="Company Logo" height="36">
+    <span id="app-name"><span class="highlight">S</span>hop<span class="highlight">F</span>loor<span class="highlight">P</span>ulse</span>
+    <span id="machine-name" class="machine-name"></span>
   </header>
 
   <main>
@@ -18,8 +25,20 @@
     <section id="events-card"></section>
   </main>
 
+  <script src="js/config.js"></script>
   <script src="js/status.js"></script>
   <script src="js/timeline.js"></script>
   <script src="js/events.js"></script>
+
+  <script>
+    loadConfig().then(cfg => {
+      document.title = cfg.app.name;
+      document.getElementById('company-logo').src = cfg.company.logo;
+      document.getElementById('machine-name').textContent = cfg.machines[0].name;
+      document.documentElement.style.setProperty('--primary', cfg.company.primaryColour);
+      document.documentElement.style.setProperty('--dark', cfg.company.darkColour);
+    });
+  </script>
+
 </body>
 </html>

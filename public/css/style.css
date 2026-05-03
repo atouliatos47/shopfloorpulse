@@ -1,29 +1,40 @@
+:root {
+  --primary: #FF6B00;
+  --dark: #2c2c2c;
+  --bg: #f4f6f8;
+  --card-bg: #ffffff;
+  --text: #1a1a1a;
+  --text-muted: #666666;
+  --border: #e0e0e0;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: #0f1923;
-  color: #ffffff;
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
 }
 
 header {
-  background: #1a2733;
+  background: #FF6B00;
   padding: 16px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 2px solid #95C11F;
+  border-bottom: 3px solid #2c2c2c;
 }
 
-header h1 {
-  color: #95C11F;
-  font-size: 24px;
-  letter-spacing: 2px;
+#app-name {
+  color: #2c2c2c;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 .machine-name {
-  color: #aaaaaa;
+  color: #4a4a4a;
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -39,21 +50,21 @@ main {
 }
 
 .card {
-  background: #1a2733;
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 24px;
-  border: 1px solid #243547;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .card h2 {
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #aaaaaa;
+  color: var(--text-muted);
   margin-bottom: 16px;
 }
 
-/* Status card */
 .status-indicator {
   display: flex;
   align-items: center;
@@ -66,34 +77,33 @@ main {
   border-radius: 50%;
 }
 
-.status-dot.on { background: #95C11F; box-shadow: 0 0 12px #95C11F; }
+.status-dot.on { background: #2ecc71; box-shadow: 0 0 12px #2ecc71; }
 .status-dot.off { background: #e74c3c; box-shadow: 0 0 12px #e74c3c; }
 .status-dot.unknown { background: #aaaaaa; }
 
 .status-label {
   font-size: 32px;
   font-weight: 700;
+  color: var(--text);
 }
 
 .status-since {
   font-size: 13px;
-  color: #aaaaaa;
+  color: var(--text-muted);
   margin-top: 8px;
 }
 
-/* Timeline */
 .timeline-bar {
   height: 40px;
-  background: #0f1923;
+  background: #cce5ff;
   border-radius: 6px;
   overflow: hidden;
   display: flex;
 }
 
-.timeline-segment.on { background: #95C11F; }
+.timeline-segment.on { background: #FF6B00; }
 .timeline-segment.off { background: #e74c3c; }
 
-/* Events table */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -103,13 +113,14 @@ table {
 th {
   text-align: left;
   padding: 8px 12px;
-  color: #aaaaaa;
-  border-bottom: 1px solid #243547;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
 }
 
 td {
   padding: 10px 12px;
-  border-bottom: 1px solid #1e2d3a;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
 }
 
 .badge {
@@ -119,5 +130,5 @@ td {
   font-weight: 600;
 }
 
-.badge.on { background: #1e3a1e; color: #95C11F; }
-.badge.off { background: #3a1e1e; color: #e74c3c; }
+.badge.on { background: #e8f5e9; color: #2e7d32; }
+.badge.off { background: #ffebee; color: #c62828; }
