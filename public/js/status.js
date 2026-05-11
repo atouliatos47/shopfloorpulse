@@ -1,4 +1,3 @@
-const MACHINE_ID = 'pero-degreaser';
 const API = '/api';
 
 async function loadStatus() {

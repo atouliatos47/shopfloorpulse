@@ -51,15 +51,19 @@
   <script src="js/timeline.js"></script>
   <script src="js/events.js"></script>
 
-  <script>
-    loadConfig().then(cfg => {
-      document.title = cfg.app.name;
-      document.getElementById('company-logo').src = cfg.company.logo;
-      document.getElementById('machine-name').textContent = cfg.machines[0].name;
-      document.documentElement.style.setProperty('--primary', cfg.company.primaryColour);
-      document.documentElement.style.setProperty('--dark', cfg.company.darkColour);
-    });
-  </script>
+<script>
+  loadConfig().then(cfg => {
+    const params = new URLSearchParams(window.location.search);
+    const machineId = params.get('machine') || cfg.machines[0].id;
+    const machine = cfg.machines.find(m => m.id === machineId) || cfg.machines[0];
+
+    document.title = cfg.app.name + ' — ' + machine.name;
+    document.getElementById('company-logo').src = cfg.company.logo;
+    document.getElementById('machine-name').textContent = machine.name;
+    document.documentElement.style.setProperty('--primary', cfg.company.primaryColour);
+    document.documentElement.style.setProperty('--dark', cfg.company.darkColour);
+  });
+</script>
 
 </body>
 </html>

@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ShopFloorPulse | Station</title>
+  <title>ShopFloorPulse</title>
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/station.css">
+  <style>
+    #app-name { font-family: 'Russo One', sans-serif; font-size: 22px; letter-spacing: 2px; color: #4a4a4a; }
+    #app-name .highlight { color: #1a6fd4; }
+  </style>
 </head>
 <body>
 
@@ -16,44 +19,46 @@
     <span id="machine-name" class="machine-name"></span>
   </header>
 
-  <main id="station-main">
-    <div id="status-display">
-      <div id="big-dot"></div>
-      <div id="big-status">--</div>
-      <div id="big-since">--</div>
-
-      <!-- Reason + counter shown after reason selected -->
-      <div id="reason-display" style="display:none">
-        <div id="reason-label"></div>
-        <div id="stop-counter">00:00:00</div>
-      </div>
-    </div>
+  <main>
+    <section id="status-card"></section>
+    <section id="timeline-card"></section>
+    <section id="events-card"></section>
   </main>
 
-  <!-- Reason Modal -->
-  <div id="reason-modal" style="display:none">
-    <div class="modal-overlay"></div>
-    <div class="modal-box reason-box">
-      <h2>Why did the machine stop?</h2>
-      <div class="reason-grid">
-        <button class="reason-btn" onclick="logReason('Breakdown')">🔧 Breakdown</button>
-        <button class="reason-btn" onclick="logReason('No Work')">📭 No Work</button>
-        <button class="reason-btn" onclick="logReason('Changeover')">🔄 Changeover</button>
-        <button class="reason-btn" onclick="logReason('Cleaning')">🧹 Cleaning</button>
-        <button class="reason-btn" onclick="logReason('Planned Maintenance')">📋 Planned Maintenance</button>
-        <button class="reason-btn" onclick="logReason('Operator Break')">☕ Operator Break</button>
-        <button class="reason-btn" onclick="logReason('Other')">❓ Other</button>
+  <div id="events-modal" style="display:none">
+    <div class="modal-overlay" onclick="closeEventsModal()"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Event Log — Today</h2>
+        <button class="modal-close" onclick="closeEventsModal()">✕</button>
       </div>
+      <table>
+        <thead>
+          <tr><th>Time</th><th>Status</th><th>Reason</th></tr>
+        </thead>
+        <tbody id="events-tbody"></tbody>
+      </table>
     </div>
   </div>
 
+  <script>
+    const MACHINE_ID = window.location.pathname.split('/').pop();
+    const API = '/api';
+  </script>
   <script src="js/config.js"></script>
-  <script src="js/station.js"></script>
+  <script src="js/status.js"></script>
+  <script src="js/timeline.js"></script>
+  <script src="js/events.js"></script>
 
   <script>
+    // Get machine ID from URL path e.g. /station/pero-degreaser
+    const machineId = window.location.pathname.split('/').pop();
+
     loadConfig().then(cfg => {
+      const machine = cfg.machines.find(m => m.id === machineId) || cfg.machines[0];
+      document.title = cfg.app.name + ' — ' + machine.name;
       document.getElementById('company-logo').src = cfg.company.logo;
-      document.getElementById('machine-name').textContent = cfg.machines[0].name;
+      document.getElementById('machine-name').textContent = machine.name;
       document.documentElement.style.setProperty('--primary', cfg.company.primaryColour);
       document.documentElement.style.setProperty('--dark', cfg.company.darkColour);
     });
