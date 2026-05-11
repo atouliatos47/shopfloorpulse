@@ -6,22 +6,7 @@ async function loadStatus() {
       ? new Date(data.timestamp).toLocaleTimeString('en-GB')
       : '--';
 
-    const isOff = data.status?.toLowerCase() === 'off';
-
-    const reasonButtons = isOff ? `
-      <div class="reason-prompt">Why did it stop?</div>
-      <div class="reason-grid">
-        <button class="reason-btn" onclick="logReason('Breakdown')">🔧 Breakdown</button>
-        <button class="reason-btn" onclick="logReason('No Work / No Orders')">📭 No Work</button>
-        <button class="reason-btn" onclick="logReason('Changeover / Setup')">🔄 Changeover</button>
-        <button class="reason-btn" onclick="logReason('Cleaning')">🧹 Cleaning</button>
-        <button class="reason-btn" onclick="logReason('Planned Maintenance')">📋 Planned Maintenance</button>
-        <button class="reason-btn" onclick="logReason('Operator Break')">☕ Operator Break</button>
-        <button class="reason-btn" onclick="logReason('Other')">❓ Other</button>
-      </div>
-    ` : '';
-
-    const html = `
+    document.getElementById('status-card').innerHTML = `
       <div class="card">
         <h2>Live Status</h2>
         <div class="status-indicator">
@@ -29,23 +14,11 @@ async function loadStatus() {
           <span class="status-label">${data.status?.toUpperCase() || 'UNKNOWN'}</span>
         </div>
         <div class="status-since">Since ${since}</div>
-        ${reasonButtons}
       </div>
     `;
-    document.getElementById('status-card').innerHTML = html;
   } catch (err) {
     console.error('Status load error:', err);
   }
-}
-
-async function logReason(reason) {
-  await fetch(`${API}/reason`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ machine_id: MACHINE_ID, reason })
-  });
-  loadEvents();
-  loadStatus();
 }
 
 function connectSSE() {
