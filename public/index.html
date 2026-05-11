@@ -25,6 +25,27 @@
     <section id="events-card"></section>
   </main>
 
+  <!-- Events Modal -->
+  <div id="events-modal" style="display:none">
+    <div class="modal-overlay" onclick="closeEventsModal()"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Event Log — Today</h2>
+        <button class="modal-close" onclick="closeEventsModal()">✕</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody id="events-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <script src="js/config.js"></script>
   <script src="js/status.js"></script>
   <script src="js/timeline.js"></script>

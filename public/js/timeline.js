@@ -1,4 +1,4 @@
-const SHIFT_START_HOUR = 6; // 6am shift start
+const SHIFT_START_HOUR = 6;
 
 async function loadTimeline() {
   try {
@@ -29,7 +29,7 @@ async function loadTimeline() {
     const html = `
       <div class="card">
         <h2>Shift Timeline (from ${SHIFT_START_HOUR}:00)</h2>
-        <div class="timeline-bar">${segments || '<div style="width:100%;background:#243547"></div>'}</div>
+        <div class="timeline-bar">${segments || '<div style="width:100%;background:#e0e0e0"></div>'}</div>
       </div>
     `;
 
@@ -40,4 +40,3 @@ async function loadTimeline() {
 }
 
 loadTimeline();
-setInterval(loadTimeline, 10000);

@@ -11,29 +11,30 @@ async function loadEvents() {
       </tr>
     `).join('');
 
-    const html = `
+    // Update modal content if open
+    const tbody = document.getElementById('events-tbody');
+    if (tbody) {
+      tbody.innerHTML = rows || '<tr><td colspan="3" style="color:#aaaaaa">No events today</td></tr>';
+    }
+
+    // Show button card
+    document.getElementById('events-card').innerHTML = `
       <div class="card">
         <h2>Event Log</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Status</th>
-              <th>Reason</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows || '<tr><td colspan="3" style="color:#aaaaaa">No events today</td></tr>'}
-          </tbody>
-        </table>
+        <button class="events-btn" onclick="openEventsModal()">View Today's Events</button>
       </div>
     `;
-
-    document.getElementById('events-card').innerHTML = html;
   } catch (err) {
     console.error('Events load error:', err);
   }
 }
 
+function openEventsModal() {
+  document.getElementById('events-modal').style.display = 'flex';
+}
+
+function closeEventsModal() {
+  document.getElementById('events-modal').style.display = 'none';
+}
+
 loadEvents();
-setInterval(loadEvents, 10000);
