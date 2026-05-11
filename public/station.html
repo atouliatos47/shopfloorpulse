@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ShopFloorPulse</title>
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
   <style>
     #app-name { font-family: 'Russo One', sans-serif; font-size: 22px; letter-spacing: 2px; color: #4a4a4a; }
     #app-name .highlight { color: #1a6fd4; }
@@ -45,17 +45,14 @@
     const MACHINE_ID = window.location.pathname.split('/').pop();
     const API = '/api';
   </script>
-  <script src="js/config.js"></script>
-  <script src="js/status.js"></script>
-  <script src="js/timeline.js"></script>
-  <script src="js/events.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/status.js"></script>
+  <script src="/js/timeline.js"></script>
+  <script src="/js/events.js"></script>
 
   <script>
-    // Get machine ID from URL path e.g. /station/pero-degreaser
-    const machineId = window.location.pathname.split('/').pop();
-
     loadConfig().then(cfg => {
-      const machine = cfg.machines.find(m => m.id === machineId) || cfg.machines[0];
+      const machine = cfg.machines.find(m => m.id === MACHINE_ID) || cfg.machines[0];
       document.title = cfg.app.name + ' — ' + machine.name;
       document.getElementById('company-logo').src = cfg.company.logo;
       document.getElementById('machine-name').textContent = machine.name;
