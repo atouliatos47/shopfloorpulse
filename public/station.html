@@ -20,8 +20,6 @@
     #big-since { font-size: 16px; color: #666; }
     #reason-display { margin-top: 16px; text-align: center; display: none; }
     #reason-label { font-size: 26px; font-weight: 700; color: #e74c3c; text-transform: uppercase; letter-spacing: 2px; }
-
-    /* Modal */
     #reason-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center; z-index: 1000; }
     #reason-modal.open { display: flex; }
     .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
@@ -68,8 +66,8 @@
     const MACHINE_ID = window.location.pathname.split('/').pop();
     const API = '/api';
     let currentStatus = '';
+    let reasonLogged = false;
 
-    // Load machine name
     fetch(API + '/config').then(r => r.json()).then(cfg => {
       const machine = cfg.machines.find(m => m.id === MACHINE_ID) || cfg.machines[0];
       document.getElementById('machine-name').textContent = machine.name;
@@ -83,19 +81,23 @@
       document.getElementById('big-since').textContent = timestamp
         ? 'Since ' + new Date(timestamp).toLocaleTimeString('en-GB') : '--';
 
-      if (s === 'off' && currentStatus !== 'off') {
+      if (s === 'off' && currentStatus !== 'off' && !reasonLogged) {
         document.getElementById('reason-display').style.display = 'none';
         document.getElementById('reason-label').textContent = '';
         document.getElementById('reason-modal').classList.add('open');
       }
+
       if (s === 'on') {
+        reasonLogged = false;
         document.getElementById('reason-modal').classList.remove('open');
         document.getElementById('reason-display').style.display = 'none';
       }
+
       currentStatus = s;
     }
 
     async function logReason(reason) {
+      reasonLogged = true;
       document.getElementById('reason-modal').classList.remove('open');
       document.getElementById('reason-label').textContent = reason;
       document.getElementById('reason-display').style.display = 'block';
