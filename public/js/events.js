@@ -5,7 +5,7 @@ async function loadEvents() {
 
     const rows = events.map(e => `
       <tr>
-        <td>${new Date(e.timestamp).toLocaleTimeString('en-GB')}</td>
+        <td>${new Date(e.timestamp).toLocaleDateString('en-GB')} ${new Date(e.timestamp).toLocaleTimeString('en-GB')}</td>
         <td><span class="badge ${e.status.toLowerCase()}">${e.status}</span></td>
         <td>${e.reason || '—'}</td>
       </tr>
