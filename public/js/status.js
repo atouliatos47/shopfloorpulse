@@ -6,10 +6,18 @@ async function loadStatus() {
       ? new Date(data.timestamp).toLocaleTimeString('en-GB')
       : '--';
 
-    const reasonBox = data.status?.toLowerCase() === 'off' ? `
-      <div class="reason-box">
-        <input id="reason-input" type="text" placeholder="Enter reason for stoppage...">
-        <button onclick="submitReason()">Submit</button>
+    const isOff = data.status?.toLowerCase() === 'off';
+
+    const reasonButtons = isOff ? `
+      <div class="reason-prompt">Why did it stop?</div>
+      <div class="reason-grid">
+        <button class="reason-btn" onclick="logReason('Breakdown')">🔧 Breakdown</button>
+        <button class="reason-btn" onclick="logReason('No Work / No Orders')">📭 No Work</button>
+        <button class="reason-btn" onclick="logReason('Changeover / Setup')">🔄 Changeover</button>
+        <button class="reason-btn" onclick="logReason('Cleaning')">🧹 Cleaning</button>
+        <button class="reason-btn" onclick="logReason('Planned Maintenance')">📋 Planned Maintenance</button>
+        <button class="reason-btn" onclick="logReason('Operator Break')">☕ Operator Break</button>
+        <button class="reason-btn" onclick="logReason('Other')">❓ Other</button>
       </div>
     ` : '';
 
@@ -21,7 +29,7 @@ async function loadStatus() {
           <span class="status-label">${data.status?.toUpperCase() || 'UNKNOWN'}</span>
         </div>
         <div class="status-since">Since ${since}</div>
-        ${reasonBox}
+        ${reasonButtons}
       </div>
     `;
     document.getElementById('status-card').innerHTML = html;
@@ -30,9 +38,7 @@ async function loadStatus() {
   }
 }
 
-async function submitReason() {
-  const reason = document.getElementById('reason-input').value.trim();
-  if (!reason) return alert('Please enter a reason');
+async function logReason(reason) {
   await fetch(`${API}/reason`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -56,7 +62,7 @@ function connectSSE() {
       }
     }
   };
-  evtSource.onerror = (err) => {
+  evtSource.onerror = () => {
     evtSource.close();
     setTimeout(connectSSE, 5000);
   };
