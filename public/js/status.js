@@ -1,4 +1,4 @@
-const API = '/api';
+
 
 async function loadStatus() {
   try {
