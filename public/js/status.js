@@ -1,5 +1,3 @@
-
-
 async function loadStatus() {
   try {
     const res = await fetch(`${API}/status/${MACHINE_ID}`);
@@ -7,6 +5,14 @@ async function loadStatus() {
     const since = data.timestamp
       ? new Date(data.timestamp).toLocaleTimeString('en-GB')
       : '--';
+
+    const reasonBox = data.status?.toLowerCase() === 'off' ? `
+      <div class="reason-box">
+        <input id="reason-input" type="text" placeholder="Enter reason for stoppage...">
+        <button onclick="submitReason()">Submit</button>
+      </div>
+    ` : '';
+
     const html = `
       <div class="card">
         <h2>Live Status</h2>
@@ -15,6 +21,7 @@ async function loadStatus() {
           <span class="status-label">${data.status?.toUpperCase() || 'UNKNOWN'}</span>
         </div>
         <div class="status-since">Since ${since}</div>
+        ${reasonBox}
       </div>
     `;
     document.getElementById('status-card').innerHTML = html;
@@ -23,10 +30,20 @@ async function loadStatus() {
   }
 }
 
+async function submitReason() {
+  const reason = document.getElementById('reason-input').value.trim();
+  if (!reason) return alert('Please enter a reason');
+  await fetch(`${API}/reason`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ machine_id: MACHINE_ID, reason })
+  });
+  loadEvents();
+  loadStatus();
+}
+
 function connectSSE() {
-  console.log('Connecting SSE...');
   const evtSource = new EventSource(`${API}/stream`);
-  evtSource.onopen = () => console.log('SSE connected!');
   evtSource.onmessage = (e) => {
     const data = JSON.parse(e.data);
     if (data.machine_id === MACHINE_ID) {
@@ -40,7 +57,6 @@ function connectSSE() {
     }
   };
   evtSource.onerror = (err) => {
-    console.error('SSE error:', err);
     evtSource.close();
     setTimeout(connectSSE, 5000);
   };
