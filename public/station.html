@@ -92,6 +92,13 @@
       }
 
       if (s === 'on') {
+        if (!reasonLogged && currentStatus === 'off') {
+          fetch(API + '/reason', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ machine_id: MACHINE_ID, reason: 'Not logged' })
+          });
+        }
         reasonLogged = false;
         clearInterval(stopTimer);
         stopStart = null;
@@ -132,15 +139,16 @@
 
     function connectSSE() {
       const es = new EventSource(API + '/stream');
+      es.onopen = () => { loadStatus(); };
       es.onmessage = e => {
         const data = JSON.parse(e.data);
         if (data.machine_id === MACHINE_ID) updateDisplay(data.status, data.timestamp);
       };
-      es.onerror = () => { es.close(); setTimeout(connectSSE, 5000); };
+      es.onerror = () => { es.close(); setTimeout(connectSSE, 3000); };
     }
 
     loadStatus();
-    setInterval(loadStatus, 10000);
+    setInterval(loadStatus, 5000);
     connectSSE();
   </script>
 
