@@ -23,6 +23,13 @@ async function loadStatus() {
 
 function connectSSE() {
   const evtSource = new EventSource(`${API}/stream`);
+
+  evtSource.onopen = () => {
+    loadStatus();
+    loadEvents();
+    loadTimeline();
+  };
+
   evtSource.onmessage = (e) => {
     const data = JSON.parse(e.data);
     if (data.machine_id === MACHINE_ID) {
@@ -35,12 +42,13 @@ function connectSSE() {
       }
     }
   };
+
   evtSource.onerror = () => {
     evtSource.close();
-    setTimeout(connectSSE, 5000);
+    setTimeout(connectSSE, 3000);
   };
 }
 
 loadStatus();
-setInterval(loadStatus, 10000);
+setInterval(loadStatus, 5000);
 connectSSE();
