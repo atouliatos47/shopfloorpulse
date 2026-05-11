@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ShopFloorPulse</title>
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
   <style>
     #app-name { font-family: 'Russo One', sans-serif; font-size: 22px; letter-spacing: 2px; color: #4a4a4a; }
     #app-name .highlight { color: #1a6fd4; }
@@ -25,7 +25,6 @@
     <section id="events-card"></section>
   </main>
 
-  <!-- Events Modal -->
   <div id="events-modal" style="display:none">
     <div class="modal-overlay" onclick="closeEventsModal()"></div>
     <div class="modal-box">
@@ -46,24 +45,25 @@
     </div>
   </div>
 
-  <script src="js/config.js"></script>
-  <script src="js/status.js"></script>
-  <script src="js/timeline.js"></script>
-  <script src="js/events.js"></script>
+  <script>
+    var MACHINE_ID = new URLSearchParams(window.location.search).get('machine') || 'pero-degreaser';
+    var API = '/api';
+  </script>
+  <script src="/js/config.js"></script>
+  <script src="/js/status.js"></script>
+  <script src="/js/timeline.js"></script>
+  <script src="/js/events.js"></script>
 
-<script>
-  loadConfig().then(cfg => {
-    const params = new URLSearchParams(window.location.search);
-    const machineId = params.get('machine') || cfg.machines[0].id;
-    const machine = cfg.machines.find(m => m.id === machineId) || cfg.machines[0];
-
-    document.title = cfg.app.name + ' — ' + machine.name;
-    document.getElementById('company-logo').src = cfg.company.logo;
-    document.getElementById('machine-name').textContent = machine.name;
-    document.documentElement.style.setProperty('--primary', cfg.company.primaryColour);
-    document.documentElement.style.setProperty('--dark', cfg.company.darkColour);
-  });
-</script>
+  <script>
+    loadConfig().then(cfg => {
+      const machine = cfg.machines.find(m => m.id === MACHINE_ID) || cfg.machines[0];
+      document.title = cfg.app.name + ' — ' + machine.name;
+      document.getElementById('company-logo').src = cfg.company.logo;
+      document.getElementById('machine-name').textContent = machine.name;
+      document.documentElement.style.setProperty('--primary', cfg.company.primaryColour);
+      document.documentElement.style.setProperty('--dark', cfg.company.darkColour);
+    });
+  </script>
 
 </body>
 </html>
