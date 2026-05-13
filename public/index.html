@@ -7,47 +7,118 @@
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    #app-name { font-family: 'Russo One', sans-serif; font-size: 22px; letter-spacing: 2px; color: #2c2c2c; }
-    #app-name .highlight { color: #1a6fd4; }
+    #app-name { font-family: 'Russo One', sans-serif; font-size: 20px; letter-spacing: 2px; color: #ffffff; }
+    #app-name .highlight { color: #FF6B00; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-left">
+  <!-- ── SIDEBAR ── -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
       <span id="app-name"><span class="highlight">S</span>hop<span class="highlight">F</span>loor<span class="highlight">P</span>ulse</span>
     </div>
-    <div class="header-right">
-      <button class="add-btn" onclick="openAddMachine()">+ Add Machine</button>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item active" onclick="showView('dashboard')">
+        <span class="nav-icon">⚡</span>
+        <span class="nav-label">Live Floor</span>
+      </li>
+      <li class="nav-item" onclick="showView('machines')">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Machines</span>
+      </li>
+      <li class="nav-item" onclick="showView('events')">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Events</span>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <span id="machine-count" class="machine-count">0 machines</span>
     </div>
-  </header>
+  </nav>
 
-  <main>
-    <div id="machine-grid"></div>
-  </main>
+  <!-- ── MAIN CONTENT ── -->
+  <div id="content">
 
-  <!-- Add Machine Modal -->
-  <div id="add-modal" style="display:none">
-    <div class="modal-overlay" onclick="closeAddMachine()"></div>
+    <header>
+      <div class="header-title" id="view-title">Live Floor</div>
+      <div class="header-right">
+        <span id="connection-summary"></span>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- DASHBOARD VIEW -->
+      <div id="view-dashboard" class="view active">
+        <div id="machine-grid"></div>
+      </div>
+
+      <!-- MACHINES VIEW -->
+      <div id="view-machines" class="view">
+        <div class="settings-panel">
+          <div class="settings-section">
+            <h3>Add Machine</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Machine Name</label>
+                <input type="text" id="new-machine-name" placeholder="e.g. Amada Press" />
+              </div>
+              <div class="form-group">
+                <label>Machine ID</label>
+                <input type="text" id="new-machine-id" placeholder="e.g. amada-press" />
+              </div>
+              <div class="form-group form-btn-group">
+                <label>&nbsp;</label>
+                <button class="btn-primary" onclick="addMachine()">+ Add</button>
+              </div>
+            </div>
+            <div id="add-error" class="form-error"></div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Manage Machines</h3>
+            <div id="machines-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENTS VIEW -->
+      <div id="view-events" class="view">
+        <div class="settings-panel">
+          <div class="settings-section">
+            <h3>Event Log</h3>
+            <div id="events-list"><p class="muted">Coming soon.</p></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Edit Machine Modal -->
+  <div id="edit-modal" style="display:none">
+    <div class="modal-overlay" onclick="closeEditModal()"></div>
     <div class="modal-box">
       <div class="modal-header">
-        <h2>Add Machine</h2>
-        <button class="modal-close" onclick="closeAddMachine()">✕</button>
+        <h2>Edit Machine</h2>
+        <button class="modal-close" onclick="closeEditModal()">✕</button>
       </div>
       <div class="modal-form">
+        <input type="hidden" id="edit-machine-original-id" />
         <label>Machine Name</label>
-        <input type="text" id="new-machine-name" placeholder="e.g. Amada Press" />
+        <input type="text" id="edit-machine-name" />
         <label>Machine ID</label>
-        <input type="text" id="new-machine-id" placeholder="e.g. amada-press" />
-        <div id="add-error" class="form-error"></div>
-        <button class="events-btn" onclick="addMachine()">Add Machine</button>
+        <input type="text" id="edit-machine-id" />
+        <div id="edit-error" class="form-error"></div>
+        <button class="btn-primary" onclick="saveEdit()">Save Changes</button>
       </div>
     </div>
   </div>
 
-  <script>
-    var API = '/api';
-  </script>
+  <script>var API = '/api';</script>
   <script src="/js/config.js"></script>
   <script src="/js/dashboard.js"></script>
 
@@ -55,9 +126,19 @@
     loadConfig().then(cfg => {
       document.title = cfg.app?.name || 'ShopFloorPulse';
       if (cfg.company?.primaryColour) document.documentElement.style.setProperty('--primary', cfg.company.primaryColour);
-      if (cfg.company?.darkColour) document.documentElement.style.setProperty('--dark', cfg.company.darkColour);
+      if (cfg.company?.darkColour)    document.documentElement.style.setProperty('--dark',    cfg.company.darkColour);
       initDashboard(cfg.machines || []);
     });
+
+    function showView(name) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('view-' + name).classList.add('active');
+      document.querySelector(`[onclick="showView('${name}')"]`).classList.add('active');
+      const titles = { dashboard: 'Live Floor', machines: 'Machines', events: 'Events' };
+      document.getElementById('view-title').textContent = titles[name] || name;
+      if (name === 'machines') renderMachinesList();
+    }
   </script>
 
 </body>

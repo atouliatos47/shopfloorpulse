@@ -44,6 +44,19 @@ app.post('/api/add-station', (req, res) => {
   res.json({ ok: true });
 });
 
+// ── EDIT MACHINE ──────────────────────────────────────────────────────────────
+app.put('/api/machine/:id', (req, res) => {
+  const { id } = req.params;
+  const { name, id: newId } = req.body;
+  const machine = config.machines.find(m => m.id === id);
+  if (!machine) return res.json({ error: 'Machine not found' });
+  if (newId !== id && config.machines.find(m => m.id === newId)) return res.json({ error: 'ID already exists' });
+  machine.name = name;
+  machine.id   = newId;
+  saveConfig();
+  res.json({ ok: true });
+});
+
 // ── DELETE MACHINE ────────────────────────────────────────────────────────────
 app.delete('/api/machine/:id', (req, res) => {
   const { id } = req.params;
