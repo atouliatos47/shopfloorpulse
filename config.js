@@ -10,11 +10,5 @@ module.exports = {
     shiftStartHour: 6,
     shiftEndHour: 22
   },
-  machines: [
-    {
-      id: 'pero-degreaser',
-      name: 'Pero Degreaser',
-      location: 'Shop Floor'
-    }
-  ]
+  machines: []
 };
