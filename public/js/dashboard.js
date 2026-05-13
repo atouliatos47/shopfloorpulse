@@ -1,19 +1,32 @@
 // ── COG SVG ───────────────────────────────────────────────────────────────────
 function renderCog(sizeClass) {
+  const teeth = 8;
+  const cx = 50, cy = 50;
+  const innerR = sizeClass === 'large' ? 16 : 14;
+  const outerR = sizeClass === 'large' ? 26 : 22;
+  const holeR  = sizeClass === 'large' ? 8  : 7;
+  const toothW = (2 * Math.PI) / teeth;
+
+  let d = '';
+  for (let i = 0; i < teeth; i++) {
+    const a0 = i * toothW - Math.PI / 2;
+    const a1 = a0 + toothW * 0.35;
+    const a2 = a0 + toothW * 0.5;
+    const a3 = a0 + toothW * 0.65;
+    const a4 = a0 + toothW;
+
+    const p = (r, a) => `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
+
+    if (i === 0) d += `M ${p(innerR, a0)} `;
+    else d += `L ${p(innerR, a0)} `;
+    d += `L ${p(outerR, a1)} L ${p(outerR, a2)} L ${p(outerR, a3)} L ${p(innerR, a4)} `;
+  }
+  d += 'Z';
+
   return `
   <svg class="cog-${sizeClass}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <g class="cog-svg">
-      <circle cx="50" cy="50" r="18"/>
-      <rect x="46" y="2"  width="8" height="20" rx="3"/>
-      <rect x="46" y="78" width="8" height="20" rx="3"/>
-      <rect x="2"  y="46" width="20" height="8" rx="3"/>
-      <rect x="78" y="46" width="20" height="8" rx="3"/>
-      <rect x="46" y="2"  width="8" height="20" rx="3" transform="rotate(45 50 50)"/>
-      <rect x="46" y="78" width="8" height="20" rx="3" transform="rotate(45 50 50)"/>
-      <rect x="2"  y="46" width="20" height="8" rx="3" transform="rotate(45 50 50)"/>
-      <rect x="78" y="46" width="20" height="8" rx="3" transform="rotate(45 50 50)"/>
-      <circle cx="50" cy="50" r="11" fill="white"/>
-    </g>
+    <path class="cog-svg" d="${d}" fill-rule="evenodd"/>
+    <circle cx="${cx}" cy="${cy}" r="${holeR}" fill="white"/>
   </svg>`;
 }
 
@@ -32,7 +45,6 @@ function buildCard(machine) {
       ${renderCog('small')}
     </div>
     <div class="card-status">--</div>
-    <div class="card-since">Waiting for signal...</div>
   `;
   return card;
 }
@@ -44,9 +56,6 @@ function updateCard(machineId, status, timestamp) {
   const state = status ? status.toLowerCase() : 'unknown';
   card.className = `machine-card ${state}`;
   card.querySelector('.card-status').textContent = status ? status.toUpperCase() : '--';
-  card.querySelector('.card-since').textContent = timestamp
-    ? 'Since ' + new Date(timestamp).toLocaleTimeString('en-GB')
-    : 'No signal yet';
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -100,7 +109,7 @@ async function checkHeartbeat(machineId) {
 
     if (data.last_seen) {
       const age = Date.now() - new Date(data.last_seen).getTime();
-      const isLive = age < 90 * 1000;
+      const isLive = age < 35 * 1000;
       badge.className = `conn-badge ${isLive ? 'live' : 'no-signal'}`;
       badge.innerHTML = `<div class="conn-dot"></div><span>${isLive ? 'Live' : 'No Signal'}</span>`;
     } else {

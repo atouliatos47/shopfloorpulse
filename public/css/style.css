@@ -178,20 +178,20 @@ main {
 /* ── COGS ────────────────────────────────────────────────────────────────── */
 .cog-wrapper {
   position: relative;
-  width: 110px;
-  height: 110px;
+  width: 100px;
+  height: 100px;
 }
 
 .cog-wrapper svg { position: absolute; }
 
-.cog-large { top: 0; left: 0; width: 75px; height: 75px; }
-.cog-small { bottom: 0; right: 0; width: 50px; height: 50px; }
+.cog-large { top: 0; left: 0; width: 70px; height: 70px; }
+.cog-small { bottom: 0; right: 0; width: 48px; height: 48px; }
 
 @keyframes spin-cw  { to { transform: rotate(360deg);  } }
 @keyframes spin-ccw { to { transform: rotate(-360deg); } }
 
-.machine-card.on .cog-large { animation: spin-cw  4s linear infinite; transform-origin: center; }
-.machine-card.on .cog-small { animation: spin-ccw 2.4s linear infinite; transform-origin: center; }
+.machine-card.on .cog-large { animation: spin-cw  3s linear infinite; transform-origin: 35px 35px; }
+.machine-card.on .cog-small { animation: spin-ccw 2s linear infinite; transform-origin: 24px 24px; }
 
 .machine-card.off .cog-large,
 .machine-card.off .cog-small,
@@ -212,11 +212,6 @@ main {
 .machine-card.on    .card-status { color: var(--on);  }
 .machine-card.off   .card-status { color: var(--off); }
 .machine-card.unknown .card-status { color: #aaaaaa;  }
-
-.card-since {
-  font-size: 12px;
-  color: var(--text-muted);
-}
 
 /* ── CONNECTION BADGE ────────────────────────────────────────────────────── */
 .conn-badge {
