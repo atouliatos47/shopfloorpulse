@@ -100,7 +100,7 @@ async function checkHeartbeat(machineId) {
 
     if (data.last_seen) {
       const age = Date.now() - new Date(data.last_seen).getTime();
-      const isLive = age < 35 * 1000;
+      const isLive = age < 90 * 1000;
       badge.className = `conn-badge ${isLive ? 'live' : 'no-signal'}`;
       badge.innerHTML = `<div class="conn-dot"></div><span>${isLive ? 'Live' : 'No Signal'}</span>`;
     } else {
