@@ -7,62 +7,56 @@
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    #app-name { font-family: 'Russo One', sans-serif; font-size: 22px; letter-spacing: 2px; color: #4a4a4a; }
+    #app-name { font-family: 'Russo One', sans-serif; font-size: 22px; letter-spacing: 2px; color: #2c2c2c; }
     #app-name .highlight { color: #1a6fd4; }
   </style>
 </head>
 <body>
 
   <header>
-    <img id="company-logo" src="" alt="Company Logo" height="36">
-    <span id="app-name"><span class="highlight">S</span>hop<span class="highlight">F</span>loor<span class="highlight">P</span>ulse</span>
-    <span id="machine-name" class="machine-name"></span>
+    <div class="header-left">
+      <span id="app-name"><span class="highlight">S</span>hop<span class="highlight">F</span>loor<span class="highlight">P</span>ulse</span>
+    </div>
+    <div class="header-right">
+      <button class="add-btn" onclick="openAddMachine()">+ Add Machine</button>
+    </div>
   </header>
 
   <main>
-    <section id="status-card"></section>
-    <section id="timeline-card"></section>
-    <section id="events-card"></section>
+    <div id="machine-grid"></div>
   </main>
 
-  <div id="events-modal" style="display:none">
-    <div class="modal-overlay" onclick="closeEventsModal()"></div>
+  <!-- Add Machine Modal -->
+  <div id="add-modal" style="display:none">
+    <div class="modal-overlay" onclick="closeAddMachine()"></div>
     <div class="modal-box">
       <div class="modal-header">
-        <h2>Event Log — Today</h2>
-        <button class="modal-close" onclick="closeEventsModal()">✕</button>
+        <h2>Add Machine</h2>
+        <button class="modal-close" onclick="closeAddMachine()">✕</button>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Time</th>
-            <th>Status</th>
-            <th>Reason</th>
-            <th>Duration</th>
-          </tr>
-        </thead>
-        <tbody id="events-tbody"></tbody>
-      </table>
+      <div class="modal-form">
+        <label>Machine Name</label>
+        <input type="text" id="new-machine-name" placeholder="e.g. Amada Press" />
+        <label>Machine ID</label>
+        <input type="text" id="new-machine-id" placeholder="e.g. amada-press" />
+        <div id="add-error" class="form-error"></div>
+        <button class="events-btn" onclick="addMachine()">Add Machine</button>
+      </div>
     </div>
   </div>
 
   <script>
-    var MACHINE_ID = new URLSearchParams(window.location.search).get('machine') || 'pero-degreaser';
     var API = '/api';
   </script>
   <script src="/js/config.js"></script>
-  <script src="/js/status.js"></script>
-  <script src="/js/timeline.js"></script>
-  <script src="/js/events.js"></script>
+  <script src="/js/dashboard.js"></script>
 
   <script>
     loadConfig().then(cfg => {
-      const machine = cfg.machines.find(m => m.id === MACHINE_ID) || cfg.machines[0];
-      document.title = cfg.app.name + ' — ' + machine.name;
-      document.getElementById('company-logo').src = cfg.company.logo;
-      document.getElementById('machine-name').textContent = machine.name;
-      document.documentElement.style.setProperty('--primary', cfg.company.primaryColour);
-      document.documentElement.style.setProperty('--dark', cfg.company.darkColour);
+      document.title = cfg.app?.name || 'ShopFloorPulse';
+      if (cfg.company?.primaryColour) document.documentElement.style.setProperty('--primary', cfg.company.primaryColour);
+      if (cfg.company?.darkColour) document.documentElement.style.setProperty('--dark', cfg.company.darkColour);
+      initDashboard(cfg.machines || []);
     });
   </script>
 
