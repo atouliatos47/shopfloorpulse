@@ -13,19 +13,51 @@ app.use(express.static('public'));
 const eventsRouter = require('./routes/events');
 app.use('/api', eventsRouter);
 
-// ── HEARTBEAT ─────────────────────────────────────────────────────────────────
-const heartbeats = {}; // { machine_id: timestamp }
-
-app.post('/api/heartbeat', (req, res) => {
-  const { machine_id } = req.body;
-  if (!machine_id) return res.json({ error: 'Missing machine_id' });
-  heartbeats[machine_id] = new Date().toISOString();
-  res.json({ ok: true });
+// ── NEON DATABASE ─────────────────────────────────────────────────────────────
+const { Pool } = require('pg');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
 
-app.get('/api/heartbeat/:machine_id', (req, res) => {
-  const ts = heartbeats[req.params.machine_id] || null;
-  res.json({ machine_id: req.params.machine_id, last_seen: ts });
+// Create heartbeats table if it doesn't exist
+pool.query(`
+  CREATE TABLE IF NOT EXISTS heartbeats (
+    machine_id TEXT PRIMARY KEY,
+    last_seen  TIMESTAMPTZ NOT NULL
+  )
+`).then(() => console.log('Heartbeats table ready'))
+  .catch(err => console.error('DB init error:', err));
+
+// ── HEARTBEAT ─────────────────────────────────────────────────────────────────
+app.post('/api/heartbeat', async (req, res) => {
+  const { machine_id } = req.body;
+  if (!machine_id) return res.json({ error: 'Missing machine_id' });
+  try {
+    await pool.query(`
+      INSERT INTO heartbeats (machine_id, last_seen)
+      VALUES ($1, NOW())
+      ON CONFLICT (machine_id) DO UPDATE SET last_seen = NOW()
+    `, [machine_id]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Heartbeat save error:', err);
+    res.json({ error: 'DB error' });
+  }
+});
+
+app.get('/api/heartbeat/:machine_id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT last_seen FROM heartbeats WHERE machine_id = $1',
+      [req.params.machine_id]
+    );
+    const last_seen = result.rows.length ? result.rows[0].last_seen : null;
+    res.json({ machine_id: req.params.machine_id, last_seen });
+  } catch (err) {
+    console.error('Heartbeat fetch error:', err);
+    res.json({ machine_id: req.params.machine_id, last_seen: null });
+  }
 });
 
 // ── GET CONFIG ────────────────────────────────────────────────────────────────
