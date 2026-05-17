@@ -9,13 +9,21 @@
 Adafruit_ADS1115 ads;
 #define BOOT_BUTTON 0  // GPIO0 — the BOOT button on ESP32 Dev Module
 
-// ── WIFI CREDENTIALS (fixed) ──────────────────────────────────────────────────
-const char* ssid     = "Clamason Wi-Fi";
-const char* password = "G1br4ltar2023!";
+// ── WIFI CREDENTIALS (multi-network) ─────────────────────────────────────────
+const char* networks[][2] = {
+  {"Clamason Wi-Fi", "G1br4ltar2023!"},
+  {"SKYPL2JH",       "zNeUN3iQa2AbCJ"}
+};
+const int networkCount = 2;
 
-// ── SERVER URLS ───────────────────────────────────────────────────────────────
-const char* serverUrl    = "http://192.168.0.32:3000/api/event";
-const char* heartbeatUrl = "http://192.168.0.32:3000/api/heartbeat";
+// ── SERVER URLS (per network) ─────────────────────────────────────────────────
+const char* serverUrls[][2] = {
+  {"http://192.168.0.32:4000/api/event",     "http://192.168.0.32:4000/api/heartbeat"},
+  {"http://192.168.0.51:4000/api/event",     "http://192.168.0.51:4000/api/heartbeat"}
+};
+
+const char* serverUrl    = serverUrls[0][0];
+const char* heartbeatUrl = serverUrls[0][1];
 
 // ── CONFIG ────────────────────────────────────────────────────────────────────
 const float THRESHOLD = 1.5;
@@ -95,17 +103,36 @@ void startConfigPortal() {
 }
 
 // ── WIFI ──────────────────────────────────────────────────────────────────────
+bool connectWiFi() {
+  for (int i = 0; i < networkCount; i++) {
+    Serial.printf("Trying %s...\n", networks[i][0]);
+    WiFi.begin(networks[i][0], networks[i][1]);
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+      delay(500);
+      Serial.print(".");
+      attempts++;
+    }
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.printf("\nConnected to %s\n", networks[i][0]);
+      Serial.println(WiFi.localIP());
+      serverUrl    = serverUrls[i][0];
+      heartbeatUrl = serverUrls[i][1];
+      Serial.printf("Server: %s\n", serverUrl);
+      return true;
+    }
+    Serial.println("\nFailed, trying next...");
+    WiFi.disconnect();
+    delay(500);
+  }
+  Serial.println("All networks failed!");
+  return false;
+}
+
 bool ensureWiFi() {
   if (WiFi.status() == WL_CONNECTED) return true;
   Serial.println("WiFi lost, reconnecting...");
-  WiFi.reconnect();
-  int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
-    delay(500);
-    Serial.print(".");
-    attempts++;
-  }
-  return WiFi.status() == WL_CONNECTED;
+  return connectWiFi();
 }
 
 // ── POST HELPERS ──────────────────────────────────────────────────────────────
@@ -174,14 +201,8 @@ void setup() {
   }
   Serial.println("ADS1115 ready");
 
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println(" Connected!");
-  Serial.println(WiFi.localIP());
+  connectWiFi();
+
   Serial.print("Monitoring machine: ");
   Serial.println(machineId);
 }
