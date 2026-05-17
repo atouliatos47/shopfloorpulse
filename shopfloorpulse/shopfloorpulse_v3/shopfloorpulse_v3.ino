@@ -209,6 +209,7 @@ void setup() {
 
 // ── LOOP ──────────────────────────────────────────────────────────────────────
 void loop() {
+  
   // Heartbeat
   if (millis() - lastHeartbeat >= HEARTBEAT_INTERVAL) {
     postHeartbeat();

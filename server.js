@@ -111,5 +111,21 @@ function saveConfig() {
   fs.writeFileSync(configPath, `module.exports = ${JSON.stringify(config, null, 2)};`);
 }
 
+const os = require('os');
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`ShopFloorPulse running on port ${PORT}`));
+app.listen(PORT, () => {
+  const nets = os.networkInterfaces();
+  let localIP = 'localhost';
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        localIP = net.address;
+        break;
+      }
+    }
+  }
+  console.log(`ShopFloorPulse running on port ${PORT}`);
+  console.log(`Local:   http://localhost:${PORT}`);
+  console.log(`Network: http://${localIP}:${PORT}`);
+});

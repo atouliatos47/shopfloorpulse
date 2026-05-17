@@ -1,14 +1,20 @@
 module.exports = {
-  company: {
-    name: 'ShopFloorPulse',
-    logo: 'images/logo.png',
-    primaryColour: '#FF6B00',
-    darkColour: '#2c2c2c'
+  "company": {
+    "name": "ShopFloorPulse",
+    "logo": "images/logo.png",
+    "primaryColour": "#FF6B00",
+    "darkColour": "#2c2c2c"
   },
-  app: {
-    name: 'ShopFloorPulse',
-    shiftStartHour: 6,
-    shiftEndHour: 22
+  "app": {
+    "name": "ShopFloorPulse",
+    "shiftStartHour": 6,
+    "shiftEndHour": 22
   },
-  machines: []
+  "machines": [
+    {
+      "id": "pero-r0",
+      "name": "Pero R0",
+      "location": "Shop Floor"
+    }
+  ]
 };

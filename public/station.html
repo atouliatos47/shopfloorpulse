@@ -8,26 +8,144 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; height: 100vh; display: flex; flex-direction: column; }
-    header { background: #FF6B00; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #2c2c2c; }
+
+    header {
+      background: #FF6B00;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #2c2c2c;
+    }
     #app-name { font-family: 'Russo One', sans-serif; font-size: 22px; letter-spacing: 2px; color: #2c2c2c; }
     #app-name .h { color: #1a6fd4; }
     #machine-name { font-size: 14px; color: #2c2c2c; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-    main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
-    #big-dot { width: 120px; height: 120px; border-radius: 50%; background: #aaa; transition: all 0.3s; }
-    #big-dot.on { background: #2ecc71; box-shadow: 0 0 50px #2ecc71; }
-    #big-dot.off { background: #e74c3c; box-shadow: 0 0 50px #e74c3c; }
-    #big-status { font-family: 'Russo One', sans-serif; font-size: 80px; color: #1a1a1a; letter-spacing: 4px; }
-    #big-since { font-size: 16px; color: #666; }
-    #reason-display { margin-top: 16px; text-align: center; display: none; }
-    #reason-label { font-size: 26px; font-weight: 700; color: #e74c3c; text-transform: uppercase; letter-spacing: 2px; }
-    #stop-counter { font-family: 'Russo One', sans-serif; font-size: 48px; color: #e74c3c; letter-spacing: 4px; margin-top: 8px; }
-    #reason-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center; z-index: 1000; }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 24px;
+    }
+
+    /* Status dot */
+    #big-dot {
+      width: 130px; height: 130px;
+      border-radius: 50%;
+      background: #cccccc;
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    #big-dot.on  { background: #2ecc71; box-shadow: 0 0 60px rgba(46,204,113,0.6); }
+    #big-dot.off { background: #e74c3c; box-shadow: 0 0 60px rgba(231,76,60,0.6); }
+
+    #big-status {
+      font-family: 'Russo One', sans-serif;
+      font-size: 80px;
+      color: #1a1a1a;
+      letter-spacing: 4px;
+    }
+
+    /* Downtime panel — hidden until downtime is active */
+    #downtime-panel {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    #reason-label {
+      font-size: 20px;
+      font-weight: 700;
+      color: #e74c3c;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    #stop-counter {
+      font-family: 'Russo One', sans-serif;
+      font-size: 56px;
+      color: #e74c3c;
+      letter-spacing: 4px;
+    }
+
+    #stop-log-btn {
+      width: 100%;
+      padding: 18px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: background 0.3s;
+    }
+    #stop-log-btn.running { background: #2ecc71; }
+    #stop-log-btn.running:hover { background: #27ae60; }
+    #stop-log-btn:not(.running):hover { background: #c0392b; }
+
+    /* Reason modal */
+    #reason-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
     #reason-modal.open { display: flex; }
-    .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
-    .modal-box { position: relative; background: #fff; border-radius: 16px; padding: 32px; width: 95%; max-width: 560px; z-index: 1001; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-    .modal-box h2 { text-align: center; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; color: #1a1a1a; margin-bottom: 24px; }
-    .reason-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .reason-btn { padding: 18px 12px; background: #f4f6f8; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; color: #1a1a1a; transition: all 0.2s; }
+
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+    }
+
+    .modal-box {
+      position: relative;
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      width: 95%;
+      max-width: 560px;
+      z-index: 1;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .modal-box h2 {
+      text-align: center;
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #1a1a1a;
+      margin-bottom: 24px;
+    }
+
+    .reason-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .reason-btn {
+      padding: 18px 12px;
+      background: #f4f6f8;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #1a1a1a;
+      transition: all 0.2s;
+    }
     .reason-btn:hover { background: #e74c3c; color: #fff; border-color: #e74c3c; }
   </style>
 </head>
@@ -41,116 +159,250 @@
   <main>
     <div id="big-dot"></div>
     <div id="big-status">--</div>
-    <div id="big-since">--</div>
-    <div id="reason-display">
+    <div id="downtime-panel">
       <div id="reason-label"></div>
       <div id="stop-counter">00:00:00</div>
+      <button id="stop-log-btn" onclick="stopAndLog()">⏹ Stop &amp; Log</button>
     </div>
   </main>
 
   <div id="reason-modal">
-    <div class="overlay"></div>
+    <div class="modal-overlay"></div>
     <div class="modal-box">
       <h2>Why did it stop?</h2>
       <div class="reason-grid">
-        <button class="reason-btn" onclick="logReason('Breakdown')">🔧 Breakdown</button>
-        <button class="reason-btn" onclick="logReason('No Work / No Orders')">📭 No Work</button>
-        <button class="reason-btn" onclick="logReason('Changeover / Setup')">🔄 Changeover</button>
-        <button class="reason-btn" onclick="logReason('Cleaning')">🧹 Cleaning</button>
-        <button class="reason-btn" onclick="logReason('Planned Maintenance')">📋 Planned Maint.</button>
-        <button class="reason-btn" onclick="logReason('Operator Break')">☕ Operator Break</button>
-        <button class="reason-btn" onclick="logReason('Other')">❓ Other</button>
+        <button class="reason-btn" onclick="selectReason('Breakdown')">🔧 Breakdown</button>
+        <button class="reason-btn" onclick="selectReason('No Work / No Orders')">📭 No Work</button>
+        <button class="reason-btn" onclick="selectReason('Changeover / Setup')">🔄 Changeover</button>
+        <button class="reason-btn" onclick="selectReason('Cleaning')">🧹 Cleaning</button>
+        <button class="reason-btn" onclick="selectReason('Planned Maintenance')">📋 Planned Maint.</button>
+        <button class="reason-btn" onclick="selectReason('Operator Break')">☕ Operator Break</button>
+        <button class="reason-btn" onclick="selectReason('Other')">❓ Other</button>
       </div>
     </div>
   </div>
 
   <script>
+    // ── CONFIG ────────────────────────────────────────────────────────────────
     const MACHINE_ID = window.location.pathname.split('/').pop();
     const API = '/api';
-    let currentStatus = '';
-    let reasonLogged = false;
-    let stopStart = null;
-    let stopTimer = null;
 
-    fetch(API + '/config').then(r => r.json()).then(cfg => {
-      const machine = cfg.machines.find(m => m.id === MACHINE_ID) || cfg.machines[0];
-      document.getElementById('machine-name').textContent = machine.name;
-      document.title = 'ShopFloorPulse — ' + machine.name;
-    });
+    // ── STATE ─────────────────────────────────────────────────────────────────
+    // States: 'unknown' | 'on' | 'off' | 'downtime'
+    // 'downtime' = OFF logged with reason, counter running, waiting for Stop&Log
+    let state        = 'unknown'; // current display state
+    let espStatus    = 'unknown'; // actual ESP reported status
+    let downtimeStart = null;
+    let stopTimer    = null;
+    let sseSource    = null;
 
-    function updateDisplay(status, timestamp) {
-      const s = status?.toLowerCase();
-      document.getElementById('big-dot').className = s || '';
-      document.getElementById('big-status').textContent = status?.toUpperCase() || '--';
-      document.getElementById('big-since').textContent = timestamp
-        ? 'Since ' + new Date(timestamp).toLocaleTimeString('en-GB') : '--';
+    // ── INIT ──────────────────────────────────────────────────────────────────
+    fetch(API + '/config')
+      .then(r => r.json())
+      .then(cfg => {
+        const machine = cfg.machines.find(m => m.id === MACHINE_ID);
+        const name = machine?.name || MACHINE_ID;
+        document.getElementById('machine-name').textContent = name;
+        document.title = 'ShopFloorPulse — ' + name;
+      })
+      .catch(() => {});
 
-      if (s === 'off' && currentStatus !== 'off' && !reasonLogged) {
-        document.getElementById('reason-display').style.display = 'none';
-        document.getElementById('reason-label').textContent = '';
-        document.getElementById('reason-modal').classList.add('open');
-      }
+    // On load — fetch status directly, no heartbeat check needed
+    fetch(API + '/status/' + MACHINE_ID)
+      .then(r => r.json())
+      .then(data => {
+        espStatus = data.status?.toLowerCase() || 'unknown';
+        state = espStatus;
+        setDisplay(espStatus);
+      })
+      .catch(() => {});
 
-      if (s === 'on') {
-        if (!reasonLogged && currentStatus === 'off') {
-          fetch(API + '/reason', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ machine_id: MACHINE_ID, reason: 'Not logged' })
-          });
-        }
-        reasonLogged = false;
-        clearInterval(stopTimer);
-        stopStart = null;
-        document.getElementById('stop-counter').textContent = '00:00:00';
-        document.getElementById('reason-modal').classList.remove('open');
-        document.getElementById('reason-display').style.display = 'none';
-      }
+    connectSSE();
 
-      currentStatus = s;
+    // Poll every 10 seconds as fallback
+    setInterval(() => {
+      if (state === 'downtime') return;
+      fetch(API + '/status/' + MACHINE_ID)
+        .then(r => r.json())
+        .then(data => handleESPStatus(data.status?.toLowerCase()))
+        .catch(() => {});
+    }, 10000);
+
+    // ── SSE ───────────────────────────────────────────────────────────────────
+    function connectSSE() {
+      if (sseSource) sseSource.close();
+      sseSource = new EventSource(API + '/stream');
+      sseSource.onmessage = e => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.machine_id === MACHINE_ID && data.status && data.status !== 'reason_updated') {
+            handleESPStatus(data.status.toLowerCase());
+          }
+        } catch {}
+      };
+      sseSource.onerror = () => {
+        sseSource.close();
+        setTimeout(connectSSE, 3000);
+      };
     }
 
-    async function logReason(reason) {
-      reasonLogged = true;
-      stopStart = new Date();
-      stopTimer = setInterval(() => {
-        const elapsed = Math.floor((new Date() - stopStart) / 1000);
-        const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-        const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-        const s = String(elapsed % 60).padStart(2, '0');
-        document.getElementById('stop-counter').textContent = `${h}:${m}:${s}`;
-      }, 1000);
+    // ── HANDLE ESP STATUS CHANGE ──────────────────────────────────────────────
+    function handleESPStatus(newStatus) {
+      const prev = espStatus;
+      espStatus = newStatus;
+
+      if (state === 'downtime') {
+        // During active downtime — only update the button colour
+        if (newStatus === 'on') {
+          const btn = document.getElementById('stop-log-btn');
+          btn.classList.add('running');
+          btn.textContent = '✅ Machine Running — Stop & Log';
+        } else {
+          const btn = document.getElementById('stop-log-btn');
+          btn.classList.remove('running');
+          btn.textContent = '⏹ Stop & Log';
+        }
+        return; // Never change display during downtime
+      }
+
+      // Normal state transitions
+      if (newStatus === 'on') {
+        state = 'on';
+        setDisplay('on');
+      } else if (newStatus === 'off') {
+        if (prev === 'on' && state === 'on') {
+          // Genuine ON→OFF transition — show modal
+          state = 'off';
+          setDisplay('off');
+          showModal();
+        } else if (state !== 'off') {
+          state = 'off';
+          setDisplay('off');
+        }
+      }
+    }
+
+    // ── SET DISPLAY ───────────────────────────────────────────────────────────
+    function setDisplay(s) {
+      document.getElementById('big-dot').className = s;
+      document.getElementById('big-status').textContent = s === 'on' ? 'ON' : s === 'off' ? 'OFF' : '--';
+    }
+
+    // ── MODAL ─────────────────────────────────────────────────────────────────
+    function showModal() {
+      document.getElementById('reason-modal').classList.add('open');
+    }
+
+    function hideModal() {
       document.getElementById('reason-modal').classList.remove('open');
+    }
+
+    // ── SELECT REASON ─────────────────────────────────────────────────────────
+    function selectReason(reason) {
+      hideModal();
+      state = 'downtime';
+      downtimeStart = new Date();
+
+      // Update display
+      setDisplay('off');
       document.getElementById('reason-label').textContent = reason;
-      document.getElementById('reason-display').style.display = 'block';
-      await fetch(API + '/reason', {
+      document.getElementById('downtime-panel').style.display = 'flex';
+      document.getElementById('stop-log-btn').classList.remove('running');
+      document.getElementById('stop-log-btn').textContent = '⏹ Stop & Log';
+
+      // Start counter
+      clearInterval(stopTimer);
+      stopTimer = setInterval(updateCounter, 1000);
+
+      // Broadcast to Live Floor
+      fetch(API + '/downtime-start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ machine_id: MACHINE_ID, reason, start: downtimeStart.toISOString() })
+      }).catch(() => {});
+
+      // Save reason to DB
+      fetch(API + '/reason', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ machine_id: MACHINE_ID, reason })
-      });
+      }).catch(() => {});
     }
 
-    function loadStatus() {
-      fetch(API + '/status/' + MACHINE_ID)
-        .then(r => r.json())
-        .then(data => updateDisplay(data.status, data.timestamp))
-        .catch(err => console.error(err));
+    // ── COUNTER ───────────────────────────────────────────────────────────────
+    function updateCounter() {
+      if (!downtimeStart) return;
+      const elapsed = Math.floor((new Date() - downtimeStart) / 1000);
+      const h  = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+      const m  = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+      const s  = String(elapsed % 60).padStart(2, '0');
+      document.getElementById('stop-counter').textContent = `${h}:${m}:${s}`;
     }
 
+    // ── STOP & LOG ────────────────────────────────────────────────────────────
+    async function stopAndLog() {
+      if (state !== 'downtime') return;
+
+      const duration = downtimeStart ? Math.floor((new Date() - downtimeStart) / 1000) : 0;
+
+      // Clear downtime state
+      clearInterval(stopTimer);
+      state         = espStatus; // return to actual ESP status
+      downtimeStart = null;
+
+      // Reset UI
+      document.getElementById('downtime-panel').style.display = 'none';
+      document.getElementById('stop-counter').textContent = '00:00:00';
+      document.getElementById('reason-label').textContent = '';
+      document.getElementById('stop-log-btn').classList.remove('running');
+      document.getElementById('stop-log-btn').textContent = '⏹ Stop & Log';
+      setDisplay(espStatus);
+
+      // Notify server
+      await fetch(API + '/downtime-end', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ machine_id: MACHINE_ID, duration })
+      }).catch(() => {});
+    }
+
+    // ── SSE ───────────────────────────────────────────────────────────────────
     function connectSSE() {
-      const es = new EventSource(API + '/stream');
-      es.onopen = () => { loadStatus(); };
-      es.onmessage = e => {
-        const data = JSON.parse(e.data);
-        if (data.machine_id === MACHINE_ID) updateDisplay(data.status, data.timestamp);
+      if (sseSource) sseSource.close();
+      sseSource = new EventSource(API + '/stream');
+      sseSource.onmessage = e => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.machine_id === MACHINE_ID && data.status && data.status !== 'reason_updated') {
+            handleESPStatus(data.status.toLowerCase());
+          }
+        } catch {}
       };
-      es.onerror = () => { es.close(); setTimeout(connectSSE, 3000); };
+      sseSource.onerror = () => {
+        sseSource.close();
+        setTimeout(connectSSE, 3000);
+      };
     }
 
-    loadStatus();
-    setInterval(loadStatus, 5000);
+    // Poll heartbeat every 30s — if no signal, reset display
+    setInterval(() => {
+      if (state === 'downtime') return;
+      fetch(API + '/heartbeat/' + MACHINE_ID)
+        .then(r => r.json())
+        .then(hb => {
+          const isLive = hb.last_seen
+            ? (Date.now() - new Date(hb.last_seen).getTime()) < 90000
+            : false;
+          if (!isLive && state !== 'unknown') {
+            state = 'unknown';
+            espStatus = 'unknown';
+            setDisplay('unknown');
+          }
+        })
+        .catch(() => {});
+    }, 30000);
+
     connectSSE();
-  </script>
 
 </body>
 </html>

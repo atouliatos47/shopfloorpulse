@@ -67,6 +67,52 @@ router.get('/events/:machine_id', async (req, res) => {
   }
 });
 
+// ── DOWNTIME START (broadcast to Live Floor) ──────────────────────────────────
+router.post('/downtime-start', (req, res) => {
+  const { machine_id, reason, start } = req.body;
+  pushUpdate({ machine_id, type: 'downtime_start', reason, start });
+  res.json({ ok: true });
+});
+
+// ── DOWNTIME END (broadcast to Live Floor) ────────────────────────────────────
+router.post('/downtime-end', (req, res) => {
+  const { machine_id, duration } = req.body;
+  pushUpdate({ machine_id, type: 'downtime_end', duration });
+  res.json({ ok: true });
+});
+
+// ── GET ALL MACHINES EVENTS (today) ───────────────────────────────────────────
+router.get('/events-all', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         e.id,
+         e.machine_id,
+         e.status,
+         e.reason,
+         e.timestamp,
+         CASE
+           WHEN e.status = 'OFF' THEN
+             LEAST(
+               EXTRACT(EPOCH FROM (
+                 LEAD(e.timestamp) OVER (PARTITION BY e.machine_id ORDER BY e.timestamp)
+                 - e.timestamp
+               )),
+               14400
+             )
+           ELSE NULL
+         END AS duration_seconds
+       FROM machine_events e
+       WHERE e.timestamp > DATE_TRUNC('day', NOW())
+       ORDER BY e.timestamp DESC`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'DB error' });
+  }
+});
+
 // Get live status for a machine
 router.get('/status/:machine_id', async (req, res) => {
   const { machine_id } = req.params;

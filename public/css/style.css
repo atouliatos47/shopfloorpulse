@@ -167,7 +167,7 @@ main {
 .machine-card.unknown { border-color: var(--border); }
 
 .card-machine-name {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
@@ -212,6 +212,37 @@ main {
 .machine-card.on    .card-status { color: var(--on);  }
 .machine-card.off   .card-status { color: var(--off); }
 .machine-card.unknown .card-status { color: #aaaaaa;  }
+
+.card-counter {
+  font-family: 'Russo One', sans-serif;
+  font-size: 20px;
+  color: var(--off);
+  letter-spacing: 2px;
+}
+
+/* ── CARD DOWNTIME PANEL ─────────────────────────────────────────────────── */
+.card-downtime {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-reason {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--off);
+  text-align: center;
+}
+
+.card-counter {
+  font-family: 'Russo One', sans-serif;
+  font-size: 20px;
+  color: var(--off);
+  letter-spacing: 2px;
+}
 
 /* ── CONNECTION BADGE ────────────────────────────────────────────────────── */
 .conn-badge {
@@ -365,6 +396,8 @@ main {
 .machine-row-info { display: flex; flex-direction: column; gap: 3px; }
 .machine-row-name { font-size: 14px; font-weight: 700; color: var(--text); }
 .machine-row-id   { font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px; }
+.machine-row-url  { font-size: 11px; color: var(--primary); text-decoration: none; letter-spacing: 0.5px; }
+.machine-row-url:hover { text-decoration: underline; }
 
 .machine-row-actions { display: flex; gap: 8px; }
 
@@ -457,3 +490,198 @@ main {
 }
 
 .modal-form input:focus { border-color: var(--primary); }
+
+/* ── EVENTS LAYOUT ───────────────────────────────────────────────────────── */
+.events-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+.charts-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .events-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── EVENTS TABLE ────────────────────────────────────────────────────────── */
+.events-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.events-filter {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text);
+  background: white;
+  outline: none;
+  cursor: pointer;
+}
+
+.events-filter:focus { border-color: var(--primary); }
+
+.events-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.events-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.events-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  background: #f9f9f9;
+  border-bottom: 1px solid var(--border);
+}
+
+.events-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.events-table tr:last-child td { border-bottom: none; }
+.events-table tr:hover td { background: #fafafa; }
+
+.event-badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.event-badge.on  { background: #e8f5e9; color: #2e7d32; }
+.event-badge.off { background: #ffebee; color: #c62828; }
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Sidebar becomes a top bar */
+  #sidebar {
+    width: 100%;
+    min-height: auto;
+    position: fixed;
+    top: 0; left: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    height: 52px;
+    z-index: 200;
+    overflow: hidden;
+  }
+
+  .sidebar-logo {
+    padding: 0;
+    border-bottom: none;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    padding-right: 16px;
+  }
+
+  #app-name { font-size: 15px; }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    gap: 0;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .nav-item {
+    padding: 0 14px;
+    height: 52px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .nav-item.active {
+    border-left: none;
+    border-bottom-color: var(--primary);
+  }
+
+  .nav-label { display: none; }
+  .nav-icon  { font-size: 18px; width: auto; }
+
+  .sidebar-footer { display: none; }
+
+  /* Content shifts down below top bar */
+  #content {
+    margin-left: 0;
+    margin-top: 52px;
+  }
+
+  header {
+    padding: 0 16px;
+    height: 48px;
+  }
+
+  .header-title { font-size: 13px; }
+
+  main { padding: 16px; }
+
+  /* Grid — single column on phones */
+  #machine-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Bigger cards on mobile */
+  .machine-card { padding: 28px 20px; }
+
+  .card-machine-name { font-size: 20px; }
+
+  .card-status { font-size: 32px; }
+
+  /* Settings panel full width */
+  .settings-panel { max-width: 100%; }
+
+  .form-row { flex-direction: column; }
+
+  .form-btn-group { width: 100%; }
+
+  .btn-primary { width: 100%; }
+
+  /* Machine row wraps on small screens */
+  .machine-row { flex-wrap: wrap; gap: 10px; }
+  .machine-row-actions { width: 100%; justify-content: flex-end; }
+}
+
+@media (max-width: 480px) {
+  #machine-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cog-wrapper { width: 120px; height: 120px; }
+  .cog-large   { width: 85px; height: 85px; }
+  .cog-small   { width: 55px; height: 55px; }
+
+  .machine-card.on .cog-large { transform-origin: 42px 42px; }
+  .machine-card.on .cog-small { transform-origin: 27px 27px; }
+}

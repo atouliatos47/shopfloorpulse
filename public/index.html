@@ -6,6 +6,7 @@
   <title>ShopFloorPulse</title>
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     #app-name { font-family: 'Russo One', sans-serif; font-size: 20px; letter-spacing: 2px; color: #ffffff; }
     #app-name .highlight { color: #FF6B00; }
@@ -87,10 +88,22 @@
 
       <!-- EVENTS VIEW -->
       <div id="view-events" class="view">
-        <div class="settings-panel">
-          <div class="settings-section">
-            <h3>Event Log</h3>
-            <div id="events-list"><p class="muted">Coming soon.</p></div>
+        <div class="events-layout">
+          <div class="settings-panel">
+            <div class="settings-section">
+              <h3>Event Log</h3>
+              <div id="events-list"><p class="muted">Loading...</p></div>
+            </div>
+          </div>
+          <div class="charts-panel">
+            <div class="settings-section">
+              <h3>Downtime by Reason</h3>
+              <canvas id="chart-donut" height="220"></canvas>
+            </div>
+            <div class="settings-section">
+              <h3>Downtime per Hour</h3>
+              <canvas id="chart-bar" height="220"></canvas>
+            </div>
           </div>
         </div>
       </div>
@@ -138,6 +151,7 @@
       const titles = { dashboard: 'Live Floor', machines: 'Machines', events: 'Events' };
       document.getElementById('view-title').textContent = titles[name] || name;
       if (name === 'machines') renderMachinesList();
+      if (name === 'events')   loadEvents();
     }
   </script>
 
